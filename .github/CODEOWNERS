@@ -1,0 +1,32 @@
+# CODEOWNERS for First-ADE Organization
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global default owners
+* @First-ADE/maintainers
+
+# Documentation
+docs/ @First-ADE/docs-team
+*.md @First-ADE/docs-team
+
+# Specifications
+.specify/ @First-ADE/architects
+specs/ @First-ADE/architects
+
+# Architecture Decision Records
+docs/adr/ @First-ADE/architects
+
+# CI/CD Configuration
+.github/ @First-ADE/devops
+Dockerfile @First-ADE/devops
+
+# Constitution and Governance
+CONSTITUTION.md @First-ADE/architects
+constitution.md @First-ADE/architects
+
+# AI Context Files
+.gemini.md @First-ADE/architects
+.claude.md @First-ADE/architects
+copilot-instructions.md @First-ADE/architects
+
+# Security-sensitive files
+SECURITY.md @First-ADE/security
