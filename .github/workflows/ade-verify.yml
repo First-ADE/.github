@@ -1,6 +1,7 @@
 name: ADE Axiom Verification
 
 on:
+  workflow_call:
   push:
     branches: [ main, develop ]
   pull_request:
