@@ -1,2 +1,5 @@
 # bashunit dev dependency
 lib/
+
+# SpecKit session state (not tracked)
+.specify/memory/
