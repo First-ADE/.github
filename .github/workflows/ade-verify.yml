@@ -2,6 +2,8 @@ name: ADE Axiom Verification
 
 on:
   workflow_call:
+  schedule:
+    - cron: '*/10 * * * *'
   push:
     branches: [ main, develop ]
   pull_request:
@@ -13,8 +15,15 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Setup Environment
-        run: |
-          # Install your required environment dependencies here
-          # e.g., pip install -r requirements.txt or npm install
-          echo "Setting up ADE environment..."
+
+      - name: Install bashunit
+        run: curl -s https://bashunit.typeddevs.com/install.sh | bash
+
+      - name: Run ADE Axiom Validation
+        run: ./scripts/validate_axioms.sh
+
+      - name: Run BDD Tests
+        run: ./scripts/run_bdd_tests.sh
+
+      - name: Run bashunit Test Suite
+        run: ./lib/bashunit tests/
