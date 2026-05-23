@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Make scripts executable
-        run: chmod +x ./scripts/*.sh
       - name: Setup Environment
         run: |
           # Install your required environment dependencies here
