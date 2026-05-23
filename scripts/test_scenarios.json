@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Missing Docstrings",
+    "description": "Checks if the model catches a new Python function that lacks any docstrings.",
+    "diff": "diff --git a/math_utils.py b/math_utils.py\nnew file mode 100644\n--- /dev/null\n+++ b/math_utils.py\n@@ -0,0 +1,5 @@\n+def compute_heavy_math(x, y):\n+    val = x ** 2 + y ** 2\n+    return val\n+",
+    "expectations": [
+      "Missing docstring for compute_heavy_math",
+      "Explain parameters x and y"
+    ]
+  },
+  {
+    "name": "Undocumented Script",
+    "description": "Checks if the model catches a newly added Bash script without updating AXIOMS.md or README.md.",
+    "diff": "diff --git a/scripts/run_cleanup.sh b/scripts/run_cleanup.sh\nnew file mode 100755\n--- /dev/null\n+++ b/scripts/run_cleanup.sh\n@@ -0,0 +1,4 @@\n+#!/bin/bash\n+echo \"Starting cleanup...\"\n+rm -rf /tmp/cache/*\n+",
+    "expectations": [
+      "Undocumented script run_cleanup.sh",
+      "Update README.md or AXIOMS.md to register this script"
+    ]
+  },
+  {
+    "name": "Axiom Violation",
+    "description": "Checks if the model flags code that violates Axiom 3 (executables must have shebangs and executable bits).",
+    "diff": "diff --git a/scripts/bad_script.sh b/scripts/bad_script.sh\nnew file mode 100644\n--- /dev/null\n+++ b/scripts/bad_script.sh\n@@ -0,0 +1,3 @@\n+echo \"Missing shebang!\"\n+exit 0\n+",
+    "expectations": [
+      "Violates Axiom 3",
+      "Missing shebang (#!/bin/bash)",
+      "File mode is not executable"
+    ]
+  }
+]
