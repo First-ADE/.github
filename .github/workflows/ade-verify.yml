@@ -2,8 +2,6 @@ name: ADE Axiom Verification
 
 on:
   workflow_call:
-  schedule:
-    - cron: '*/10 * * * *'
   push:
     branches: [ main, develop ]
   pull_request:
@@ -15,9 +13,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Install bashunit
-        run: curl -s https://bashunit.typeddevs.com/install.sh | bash
 
       - name: Run ADE Axiom Validation
         run: ./scripts/validate_axioms.sh
