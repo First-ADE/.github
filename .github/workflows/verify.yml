@@ -1,3 +1,11 @@
+name: ADE Verification Caller
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
   ade-check:
-    uses: First-ADE/.github/.github/workflows/verify.yml@main
+    uses: First-ADE/.github/.github/workflows/ade-verify.yml@main
