@@ -8,4 +8,4 @@ on:
 
 jobs:
   ade-check:
-    uses: First-ADE/.github/.github/workflows/ade-verify.yml@main
+    uses: First-ADE/.github/.github/workflows/ade-verify.yml@14a8cfcdcd92e6088fa239f7e798cc9fdd8bc690
