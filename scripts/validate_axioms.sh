@@ -101,6 +101,53 @@ else
 fi
 
 ##############################################################################
+# AXIOM 6: Unresolved conflict markers must not exist
+##############################################################################
+echo ""
+echo "--- A6: Git conflict markers ---"
+
+CONFLICT_FILES=$(grep -rnwlE '^<<<<<<<|^>>>>>>>' "$REPO_ROOT" --exclude-dir={.git,.bashunit,node_modules,lib} --exclude="validate_axioms.sh" 2>/dev/null || true)
+if [ -z "$CONFLICT_FILES" ]; then
+  pass "No unresolved git conflict markers found"
+else
+  fail "Found unresolved conflict markers in the following file(s):"
+  for f in $CONFLICT_FILES; do
+    echo "    - $f"
+  done
+fi
+
+##############################################################################
+# AXIOM 7: All commits in the PR must be signed
+##############################################################################
+echo ""
+echo "--- A7: Commit signatures ---"
+
+if git rev-parse --verify origin/main >/dev/null 2>&1; then
+  COMMIT_RANGE="origin/main...HEAD"
+else
+  COMMIT_RANGE="HEAD~1..HEAD"
+fi
+
+echo "Checking commits in range: $COMMIT_RANGE"
+UNSIGNED_COMMITS=""
+for commit_data in $(git log "$COMMIT_RANGE" --format="%H:%G?" 2>/dev/null || true); do
+  sha=$(echo "$commit_data" | cut -d: -f1)
+  sig_status=$(echo "$commit_data" | cut -d: -f2)
+  if [ "$sig_status" = "N" ]; then
+    UNSIGNED_COMMITS="$UNSIGNED_COMMITS $sha"
+  fi
+done
+
+if [ -z "$UNSIGNED_COMMITS" ]; then
+  pass "All commits in branch are signed"
+else
+  fail "The following commit(s) are UNSIGNED:"
+  for sha in $UNSIGNED_COMMITS; do
+    echo "    - $sha"
+  done
+fi
+
+##############################################################################
 # Summary
 ##############################################################################
 echo ""
