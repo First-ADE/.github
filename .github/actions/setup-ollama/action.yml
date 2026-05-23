@@ -1,0 +1,39 @@
+name: 'Setup Local Ollama'
+description: 'Install Ollama, cache models, start Ollama server, and pull specified model'
+inputs:
+  model:
+    description: 'Model name to pull'
+    required: true
+    default: 'qwen2.5-coder:3b'
+runs:
+  using: 'composite'
+  steps:
+    - name: Cache Ollama Model
+      uses: actions/cache@v4
+      with:
+        path: ~/.ollama
+        key: ollama-${{ inputs.model }}
+
+    - name: Install Ollama
+      shell: bash
+      run: curl -fsSL https://ollama.com/install.sh | bash
+
+    - name: Start Ollama Server
+      shell: bash
+      run: |
+        ollama serve &
+        echo "Waiting for Ollama server to start..."
+        for i in {1..12}; do
+          if curl -s http://localhost:11434 >/dev/null; then
+            echo "Ollama server is up and listening on port 11434!"
+            exit 0
+          fi
+          echo "Still waiting for Ollama... ($i/12)"
+          sleep 5
+        done
+        echo "Error: Ollama server failed to start within 60 seconds."
+        exit 1
+
+    - name: Pull Model
+      shell: bash
+      run: ollama pull ${{ inputs.model }}
