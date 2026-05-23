@@ -14,7 +14,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 AXIOMS_FILE="$REPO_ROOT/AXIOMS.md"
 CONSTITUTION_FILE="$REPO_ROOT/.specify/memory/constitution.md"
 README_FILE="$REPO_ROOT/README.md"
-MODEL="qwen2.5-coder:3b"
+MODEL="${DOCUMENTATION_MODEL:-qwen2.5-coder:3b}"
 
 echo "🔍 Collecting PR review context..."
 

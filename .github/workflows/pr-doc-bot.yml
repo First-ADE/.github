@@ -9,6 +9,9 @@ permissions:
   pull-requests: write
   issues: write
 
+env:
+  DOCUMENTATION_MODEL: ${{ vars.DOCUMENTATION_MODEL || 'qwen2.5-coder:3b' }}
+
 jobs:
   doc-review:
     runs-on: ubuntu-latest
@@ -23,7 +26,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.ollama
-          key: ollama-qwen2.5-coder-3b
+          key: ollama-${{ env.DOCUMENTATION_MODEL }}
 
       - name: Install Ollama
         run: curl -fsSL https://ollama.com/install.sh | bash
@@ -34,7 +37,7 @@ jobs:
           sleep 5
 
       - name: Pull Model
-        run: ollama pull qwen2.5-coder:3b
+        run: ollama pull ${{ env.DOCUMENTATION_MODEL }}
 
       - name: Execute PR Documentation Review
         run: bash scripts/review_pr_doc.sh

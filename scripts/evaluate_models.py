@@ -5,8 +5,8 @@ import urllib.request
 import urllib.error
 
 # Configurable options
-PRIMARY_MODEL = "qwen2.5-coder:3b"
-EVALUATOR_MODEL = "qwen2.5-coder:3b"
+PRIMARY_MODEL = os.getenv("DOCUMENTATION_MODEL", "qwen2.5-coder:3b")
+EVALUATOR_MODEL = os.getenv("EVALUATION_JUDGE_MODEL", "qwen2.5-coder:3b")
 SCENARIOS_FILE = os.path.join(os.path.dirname(__file__), "test_scenarios.json")
 
 def call_ollama(model, prompt):
