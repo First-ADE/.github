@@ -1,0 +1,53 @@
+name: Cross-Model Evaluation & Quality Benchmark
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0' # Every Sunday at midnight
+
+permissions:
+  contents: write
+
+jobs:
+  benchmark-models:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Cache Ollama Models
+        uses: actions/cache@v4
+        with:
+          path: ~/.ollama
+          key: ollama-all-benchmark-models-v1
+
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | bash
+
+      - name: Start Ollama Server
+        run: |
+          ollama serve &
+          sleep 5
+
+      - name: Pull Evaluation Models
+        run: |
+          ollama pull qwen2.5-coder:3b
+          ollama pull llama3.2:3b
+          ollama pull llama3.2:1b
+
+      - name: Run Cross-Model Benchmark
+        run: python scripts/evaluate_models.py
+
+      - name: Commit Benchmark Results
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add MODEL_BENCHMARK.md
+          git commit -m "chore(benchmark): update cross-model evaluation report" || echo "No changes to commit"
+          git push
