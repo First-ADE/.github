@@ -2,8 +2,12 @@ name: Constitution Review (AI)
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Daily at midnight
+    - cron: '0 */12 * * *'  # Twice daily
   workflow_dispatch:       # Manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -17,22 +21,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Cache Ollama Model
-        uses: actions/cache@v4
+      - name: Setup Ollama and Pull Model
+        uses: ./.github/actions/setup-ollama
         with:
-          path: ~/.ollama
-          key: ollama-qwen2.5-coder-3b
-
-      - name: Install Ollama
-        run: curl -fsSL https://ollama.com/install.sh | bash
-
-      - name: Start Ollama Server
-        run: |
-          ollama serve &
-          sleep 5
-
-      - name: Pull Model
-        run: ollama pull qwen2.5-coder:3b
+          model: 'qwen2.5-coder:3b'
 
       - name: Run Constitution Review
         run: bash scripts/review_constitution.sh
