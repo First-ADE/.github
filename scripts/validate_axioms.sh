@@ -11,6 +11,7 @@
 #   A2: All shell scripts must have a proper shebang (#!/bin/bash)
 #   A3: All shell scripts must be executable in git
 #   A4: All workflow YAML files must be syntactically valid
+#   A5: All CI checks must pass before merge (enforced by branch protection)
 #
 # Usage: ./scripts/validate_axioms.sh
 ################################################################################
