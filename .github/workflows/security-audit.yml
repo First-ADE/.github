@@ -1,0 +1,58 @@
+name: Automated AI Security & Compliance Auditor
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # Daily at 4:00 AM
+  workflow_dispatch:       # Manual trigger
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+env:
+  AUDIT_MODEL: 'qwen2.5-coder:3b'
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Ollama and Pull Model
+        uses: ./.github/actions/setup-ollama
+        with:
+          model: ${{ env.AUDIT_MODEL }}
+
+      - name: Run Security Auditor
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/audit_security.sh
+
+      - name: Check Audit Report & Proactively Create Issue
+        if: failure() || hashFiles('SECURITY_AUDIT.md') != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f "SECURITY_AUDIT.md" ]; then
+            # Extract status to see if we have warnings or failures
+            if grep -q "Compliance Status: \[Fail\]" SECURITY_AUDIT.md || grep -q "Compliance Status: \[Warn\]" SECURITY_AUDIT.md; then
+              echo "🚨 Security audit flagged warnings or failures. Filing an automated tracking issue..."
+              # Check if a security issue is already open to avoid duplicates
+              EXISTING_ISSUE=$(gh issue list --search "Automated Security & Compliance Report" --json number --jq ".[0].number")
+              if [ -z "$EXISTING_ISSUE" ] || [ "$EXISTING_ISSUE" = "null" ]; then
+                gh issue create \
+                  --title "🚨 Automated Security & Compliance Auditor Report" \
+                  --body-file SECURITY_AUDIT.md \
+                  --label "security,bug"
+              else
+                echo "💬 Updating existing tracking issue #$EXISTING_ISSUE with the new report..."
+                gh issue comment "$EXISTING_ISSUE" --body-file SECURITY_AUDIT.md
+              fi
+            fi
+          fi

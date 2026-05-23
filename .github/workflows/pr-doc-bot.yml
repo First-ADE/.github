@@ -24,26 +24,18 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
           fetch-depth: 0 # Get all history for diff checks
 
-      - name: Cache Ollama Model
-        uses: actions/cache@v4
+      - name: Setup Ollama and Pull Model
+        uses: ./.github/actions/setup-ollama
         with:
-          path: ~/.ollama
-          key: ollama-${{ env.DOCUMENTATION_MODEL }}
-
-      - name: Install Ollama
-        run: curl -fsSL https://ollama.com/install.sh | bash
-
-      - name: Start Ollama Server
-        run: |
-          ollama serve &
-          sleep 5
-
-      - name: Pull Model
-        run: ollama pull ${{ env.DOCUMENTATION_MODEL }}
+          model: ${{ env.DOCUMENTATION_MODEL }}
 
       - name: Execute PR Documentation Review
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: bash scripts/review_pr_doc.sh
 
       - name: Post PR Review Comment
