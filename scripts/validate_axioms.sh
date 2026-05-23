@@ -31,7 +31,7 @@ echo ""
 ##############################################################################
 echo "--- A1: Required files ---"
 
-for required_file in README.md LICENSE; do
+for required_file in README.md LICENSE AXIOMS.md; do
   if [ -f "$REPO_ROOT/$required_file" ]; then
     pass "$required_file exists"
   else
