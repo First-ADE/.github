@@ -39,9 +39,12 @@ if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
   exit 0
 fi
 
-# 4. Create and push branch
-echo "🚀 Creating and pushing branch $BRANCH_NAME off main..."
+# 4. Create and push branch with an empty commit to allow PR creation
+echo "🚀 Creating branch $BRANCH_NAME off main..."
 git checkout -b "$BRANCH_NAME" origin/main
+echo "🚀 Creating initial empty commit for GitOps Dev Cycle..."
+git commit --allow-empty -m "chore(dev-cycle): initialize branch for issue #$NUMBER"
+echo "🚀 Pushing branch to remote..."
 git push origin "$BRANCH_NAME"
 
 # 5. Open Draft Pull Request in the current repository
@@ -61,7 +64,7 @@ $BODY
 *Created by GitOps Dev-Cycle Trigger* · Branch: \`$BRANCH_NAME\`"
 
 echo "📄 Creating Draft Pull Request..."
-PR_URL=$(gh pr create --draft --title "$PR_TITLE" --body "$PR_BODY" --head "$BRANCH_NAME" --base main 2>/dev/null || echo "")
+PR_URL=$(gh pr create --draft --title "$PR_TITLE" --body "$PR_BODY" --head "$BRANCH_NAME" --base main || echo "")
 
 if [ -n "$PR_URL" ]; then
   echo "🎉 Successfully created Draft PR: $PR_URL"
