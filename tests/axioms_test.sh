@@ -16,6 +16,8 @@ function test_axioms_md_defines_axiom_ids() {
   assert_contains "A2:" "$content"
   assert_contains "A3:" "$content"
   assert_contains "A4:" "$content"
+  assert_contains "A5:" "$content"
+  assert_contains "A8:" "$content"
 }
 
 function test_axioms_md_has_testable_statements() {

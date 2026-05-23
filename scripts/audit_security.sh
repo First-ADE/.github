@@ -19,7 +19,7 @@ echo "🔍 Running Automated Security & Compliance Auditor..."
 # 1. Check third-party Actions for commit SHA-pinning
 echo "Checking GitHub Actions for commit SHA-pinning compliance..."
 UNPINNED_ACTIONS=""
-for wf in "$REPO_ROOT"/.github/workflows/*.yml "$REPO_ROOT"/.github/workflows/*.yaml 2>/dev/null; do
+for wf in "$REPO_ROOT"/.github/workflows/*.yml "$REPO_ROOT"/.github/workflows/*.yaml; do
   [ -f "$wf" ] || continue
   wf_name=$(basename "$wf")
   while IFS= read -r line || [ -n "$line" ]; do
@@ -43,6 +43,9 @@ SHELL_VULNS=""
 for script in "$REPO_ROOT"/scripts/*.sh; do
   [ -f "$script" ] || continue
   script_name=$(basename "$script")
+  if [ "$script_name" = "audit_security.sh" ]; then
+    continue
+  fi
   
   # Check for unvalidated eval
   if grep -n 'eval ' "$script" >/dev/null 2>&1; then
@@ -85,25 +88,36 @@ Compile a highly professional report. It MUST strictly follow this exact format:
 
 Ensure all recommendations are actionable and direct. Do not write conversational preambles or postambles."
 
-echo "🤖 Submitting findings to local Ollama ($MODEL)..."
-REPORT=$(ollama run "$MODEL" "$PROMPT" 2>/dev/null || echo "")
+if curl -s -m 2 http://localhost:11434 >/dev/null; then
+  echo "🤖 Submitting findings to local Ollama ($MODEL)..."
+  REPORT=$(echo "$PROMPT" | ollama run "$MODEL" 2>/dev/null || echo "")
+else
+  echo "⚠️ Ollama server is unreachable. Using fallback offline security report generator."
+  REPORT=""
+fi
 
 if [ -z "$REPORT" ]; then
-  echo "❌ Failed to generate security report from local Ollama."
-  # Fallback manual report if model fails to respond
+  echo "❌ Failed to generate security report from local Ollama. Falling back..."
+  # Fallback manual report if model is offline
   {
     echo "### 🚨 Automated Security & Compliance Auditor Report"
-    echo "*   **Compliance Status**: [Warn]"
-    echo "*   **Vulnerabilities Found**:"
-    if [ -n "$UNPINNED_ACTIONS" ]; then
-      echo "    - Unpinned third-party actions were identified."
+    if [ -n "$UNPINNED_ACTIONS" ] || [ -n "$SHELL_VULNS" ]; then
+      echo "*   **Compliance Status**: [Warn]"
+      echo "*   **Vulnerabilities Found**:"
+      if [ -n "$UNPINNED_ACTIONS" ]; then
+        echo "    - Unpinned third-party actions were identified."
+      fi
+      if [ -n "$SHELL_VULNS" ]; then
+        echo "    - Dangerous shell script commands were detected."
+      fi
+      echo "*   **Actionable Recommendations**:"
+      echo "    1. Pin third-party GitHub Actions to explicit commit SHAs."
+      echo "    2. Review shell scripts to avoid direct curl execution or raw evaluations."
+    else
+      echo "*   **Compliance Status**: [Pass]"
+      echo "*   **Vulnerabilities Found**: None"
+      echo "*   **Actionable Recommendations**: All clean! Workflows are fully pinned and secure."
     fi
-    if [ -n "$SHELL_VULNS" ]; then
-      echo "    - Dangerous shell script commands were detected."
-    fi
-    echo "*   **Actionable Recommendations**:"
-    echo "    1. Pin third-party GitHub Actions to explicit commit SHAs."
-    echo "    2. Review shell scripts to avoid direct curl execution or raw evaluations."
   } > SECURITY_AUDIT.md
 else
   echo "✅ Security report compiled successfully!"

@@ -55,6 +55,16 @@ Axioms are enforced by `scripts/validate_axioms.sh` and verified by `tests/axiom
 
 ---
 
+## A8: Dual-Environment Compatibility
+
+> Every development/automation script in `scripts/` MUST be implemented in both Unix Bash (`.sh`) and Windows PowerShell (`.ps1`).
+
+**Rationale:** The organization supports developers and execution environments across both Unix (CI, macOS, Linux) and Windows systems. Providing dual implementations ensures a seamless, frictionless, and robust Agentic Developer Experience (ADE) globally, eliminating execution gaps.
+
+**Validation:** Automated script checks verify that for every script under `scripts/`, an equivalent file of the opposite extension exists and has correct syntax/permissions.
+
+---
+
 ## Adding New Axioms
 
 To add a new axiom:

@@ -148,6 +148,36 @@ else
 fi
 
 ##############################################################################
+# AXIOM 8: Dual-Environment Parity
+##############################################################################
+echo ""
+echo "--- A8: Dual-Environment Script Parity ---"
+
+for script in "$REPO_ROOT"/scripts/*.sh; do
+  [ -f "$script" ] || continue
+  name="$(basename "$script")"
+  base="${name%.sh}"
+  ps1_script="$REPO_ROOT/scripts/${base}.ps1"
+  if [ -f "$ps1_script" ]; then
+    pass "$name has matching .ps1"
+  else
+    fail "$name has NO matching .ps1 script"
+  fi
+done
+
+for script in "$REPO_ROOT"/scripts/*.ps1; do
+  [ -f "$script" ] || continue
+  name="$(basename "$script")"
+  base="${name%.ps1}"
+  sh_script="$REPO_ROOT/scripts/${base}.sh"
+  if [ -f "$sh_script" ]; then
+    pass "$name has matching .sh"
+  else
+    fail "$name has NO matching .sh script"
+  fi
+done
+
+##############################################################################
 # Summary
 ##############################################################################
 echo ""

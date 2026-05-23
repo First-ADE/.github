@@ -103,6 +103,39 @@ step_then_executable() {
   fi
 }
 
+step_then_sh_has_ps1() {
+  local failed=0
+  for script in "$CONTEXT_DIR"/*.sh; do
+    [ -f "$script" ] || continue
+    local base="${script%.sh}"
+    local ps1_script="${base}.ps1"
+    if [ ! -f "$ps1_script" ]; then
+      fail_step "Then $(basename "$script") should have a corresponding .ps1 script — NOT FOUND"
+      failed=1
+    fi
+  done
+  if [ "$failed" -eq 0 ]; then
+    pass_step "Then every \".sh\" file should have a corresponding \".ps1\" script"
+  fi
+}
+
+step_then_ps1_has_sh() {
+  local failed=0
+  for script in "$CONTEXT_DIR"/*.ps1; do
+    [ -f "$script" ] || continue
+    local base="${script%.ps1}"
+    local sh_script="${base}.sh"
+    if [ ! -f "$sh_script" ]; then
+      fail_step "Then $(basename "$script") should have a corresponding .sh script — NOT FOUND"
+      failed=1
+    fi
+  done
+  if [ "$failed" -eq 0 ]; then
+    pass_step "Then every \".ps1\" file should have a corresponding \".sh\" script"
+  fi
+}
+
+
 ##############################################################################
 # Gherkin Parser & Runner
 ##############################################################################
@@ -171,6 +204,16 @@ run_feature_file() {
       "Then every \".sh\" file should be executable in git")
         old_errors=$ERRORS
         step_then_executable
+        [ "$ERRORS" -gt "$old_errors" ] && scenario_failed=1
+        ;;
+      "Then every \".sh\" file should have a corresponding \".ps1\" script")
+        old_errors=$ERRORS
+        step_then_sh_has_ps1
+        [ "$ERRORS" -gt "$old_errors" ] && scenario_failed=1
+        ;;
+      "Then every \".ps1\" file should have a corresponding \".sh\" script")
+        old_errors=$ERRORS
+        step_then_ps1_has_sh
         [ "$ERRORS" -gt "$old_errors" ] && scenario_failed=1
         ;;
       As\ *|I\ want\ *|So\ that\ *)
