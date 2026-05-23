@@ -45,6 +45,14 @@ Axioms are enforced by `scripts/validate_axioms.sh` and verified by `tests/axiom
 
 **Validation:** Assert no tab indentation and assert the presence of a `jobs:` block.
 
+## A5: CI Must Pass Before Merge
+
+> All CI checks MUST pass before any pull request is merged to `main`.
+
+**Rationale:** Merging with failing checks introduces broken invariants into the trunk. This axiom is the meta-guarantee that all other axioms are actually enforced. PR #19 was merged with a failing A3 check — this axiom exists to prevent that from ever recurring.
+
+**Validation:** GitHub branch protection rules require status checks to pass. The `ade-verify.yml` workflow must be a required status check on `main`.
+
 ---
 
 ## Adding New Axioms
