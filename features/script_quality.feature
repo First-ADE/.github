@@ -10,3 +10,11 @@ Feature: Shell Script Quality
   Scenario: All scripts are executable
     Given the scripts in "scripts/" directory
     Then every ".sh" file should be executable in git
+
+  Scenario: Every shell script has a matching PowerShell script
+    Given the scripts in "scripts/" directory
+    Then every ".sh" file should have a corresponding ".ps1" script
+
+  Scenario: Every PowerShell script has a matching shell script
+    Given the scripts in "scripts/" directory
+    Then every ".ps1" file should have a corresponding ".sh" script

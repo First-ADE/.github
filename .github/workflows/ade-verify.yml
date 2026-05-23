@@ -33,3 +33,15 @@ jobs:
 
       - name: Run bashunit Test Suite
         run: ./lib/bashunit tests/
+
+  verify-axioms-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run ADE Axiom Validation (PowerShell)
+        run: pwsh ./scripts/validate_axioms.ps1
+
+      - name: Run BDD Tests (PowerShell)
+        run: pwsh ./scripts/run_bdd_tests.ps1
