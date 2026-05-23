@@ -1,0 +1,47 @@
+name: PR Documentation Bot
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  doc-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Get all history for diff checks
+
+      - name: Cache Ollama Model
+        uses: actions/cache@v4
+        with:
+          path: ~/.ollama
+          key: ollama-qwen2.5-coder-3b
+
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | bash
+
+      - name: Start Ollama Server
+        run: |
+          ollama serve &
+          sleep 5
+
+      - name: Pull Model
+        run: ollama pull qwen2.5-coder:3b
+
+      - name: Execute PR Documentation Review
+        run: bash scripts/review_pr_doc.sh
+
+      - name: Post PR Review Comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-file: PR_REVIEW.md
