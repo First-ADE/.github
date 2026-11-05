@@ -1,0 +1,27 @@
+name: ADE axioms
+description: Run the First-ADE axiom validator (A1-A4, A6-A9) against the calling repository.
+author: Brandon Fox
+
+inputs:
+  ref:
+    description: Git ref of First-ADE/.github to take the validator from.
+    required: false
+    default: main
+
+runs:
+  using: composite
+  steps:
+    - name: Fetch the validator
+      shell: bash
+      run: |
+        set -euo pipefail
+        tmp="$(mktemp -d)"
+        git clone --quiet --depth 1 --branch "${{ inputs.ref }}" https://github.com/First-ADE/.github.git "$tmp/first-ade-github"
+        echo "ADE_VALIDATOR=$tmp/first-ade-github/scripts/validate_axioms.sh" >> "$GITHUB_ENV"
+    - name: Validate axioms
+      shell: bash
+      env:
+        ADE_REPO_ROOT: ${{ github.workspace }}
+      run: |
+        set -euo pipefail
+        bash "$ADE_VALIDATOR"
