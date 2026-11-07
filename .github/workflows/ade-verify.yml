@@ -23,7 +23,7 @@ jobs:
 
       - name: Install bashunit
         if: steps.cache-bashunit.outputs.cache-hit != 'true'
-        run: curl -s https://bashunit.typeddevs.com/install.sh | bash
+        run: curl -sSL https://bashunit.typeddevs.com/install.sh | bash
 
       - name: Run ADE Axiom Validation
         run: ./scripts/validate_axioms.sh
