@@ -103,6 +103,34 @@ step_then_executable() {
   fi
 }
 
+step_then_file_contains() {
+  local filename="$1" text="$2"
+  if [ -f "$CONTEXT_DIR/$filename" ] && grep -qF -- "$text" "$CONTEXT_DIR/$filename"; then
+    pass_step "Then the file \"$filename\" should contain \"$text\""
+  else
+    fail_step "Then the file \"$filename\" should contain \"$text\" â€” NOT FOUND"
+  fi
+}
+
+step_then_line_starts() {
+  local n="$1" filename="$2" text="$3"
+  local actual
+  actual=$(sed -n "${n}p" "$CONTEXT_DIR/$filename" 2>/dev/null | tr -d '\r')
+  case "$actual" in
+    "$text"*) pass_step "Then line $n of \"$filename\" should start with \"$text\"" ;;
+    *) fail_step "Then line $n of \"$filename\" should start with \"$text\" â€” got '$actual'" ;;
+  esac
+}
+
+step_then_some_line_starts() {
+  local n="$1" filename="$2" text="$3"
+  if head -n "$n" "$CONTEXT_DIR/$filename" 2>/dev/null | tr -d '\r' | grep -qF -- "$text"; then
+    pass_step "Then one of the first $n lines of \"$filename\" should start with \"$text\""
+  else
+    fail_step "Then one of the first $n lines of \"$filename\" should start with \"$text\" â€” NOT FOUND"
+  fi
+}
+
 ##############################################################################
 # Gherkin Parser & Runner
 ##############################################################################
@@ -171,6 +199,29 @@ run_feature_file() {
       "Then every \".sh\" file should be executable in git")
         old_errors=$ERRORS
         step_then_executable
+        [ "$ERRORS" -gt "$old_errors" ] && scenario_failed=1
+        ;;
+      Then\ the\ file\ \"*\"\ should\ contain\ \"*\")
+        file=$(echo "$line" | sed 's/Then the file "\(.*\)" should contain "\(.*\)"/\1/')
+        text=$(echo "$line" | sed 's/Then the file "\(.*\)" should contain "\(.*\)"/\2/')
+        old_errors=$ERRORS
+        step_then_file_contains "$file" "$text"
+        [ "$ERRORS" -gt "$old_errors" ] && scenario_failed=1
+        ;;
+      Then\ line\ *\ of\ \"*\"\ should\ start\ with\ \"*\")
+        n=$(echo "$line" | sed 's/Then line \([0-9]*\) of "\(.*\)" should start with "\(.*\)"/\1/')
+        file=$(echo "$line" | sed 's/Then line \([0-9]*\) of "\(.*\)" should start with "\(.*\)"/\2/')
+        text=$(echo "$line" | sed 's/Then line \([0-9]*\) of "\(.*\)" should start with "\(.*\)"/\3/')
+        old_errors=$ERRORS
+        step_then_line_starts "$n" "$file" "$text"
+        [ "$ERRORS" -gt "$old_errors" ] && scenario_failed=1
+        ;;
+      Then\ one\ of\ the\ first\ *\ lines\ of\ \"*\"\ should\ start\ with\ \"*\")
+        n=$(echo "$line" | sed 's/Then one of the first \([0-9]*\) lines of "\(.*\)" should start with "\(.*\)"/\1/')
+        file=$(echo "$line" | sed 's/Then one of the first \([0-9]*\) lines of "\(.*\)" should start with "\(.*\)"/\2/')
+        text=$(echo "$line" | sed 's/Then one of the first \([0-9]*\) lines of "\(.*\)" should start with "\(.*\)"/\3/')
+        old_errors=$ERRORS
+        step_then_some_line_starts "$n" "$file" "$text"
         [ "$ERRORS" -gt "$old_errors" ] && scenario_failed=1
         ;;
       As\ *|I\ want\ *|So\ that\ *)

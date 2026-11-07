@@ -1,0 +1,37 @@
+name: ADE axioms
+description: Run the First-ADE axiom validator (A1-A4, A6-A9) against the calling repository.
+author: Brandon Fox
+
+inputs:
+  ref:
+    description: >-
+      Git ref (branch, tag or commit SHA) of First-ADE/.github to take the validator from.
+      Empty (the default) means the same ref this action was pinned at, so a SHA pin
+      validates with the validator of that SHA, not with whatever main holds today.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Fetch the validator
+      shell: bash
+      env:
+        INPUT_REF: ${{ inputs.ref }}
+        ACTION_REF: ${{ github.action_ref }}
+      run: |
+        set -euo pipefail
+        ref="${INPUT_REF:-${ACTION_REF:-main}}"
+        tmp="$(mktemp -d)"
+        git init --quiet "$tmp/first-ade-github"
+        git -C "$tmp/first-ade-github" fetch --quiet --depth 1 https://github.com/First-ADE/.github.git "$ref"
+        git -C "$tmp/first-ade-github" checkout --quiet FETCH_HEAD
+        echo "ADE validator taken from First-ADE/.github@$ref ($(git -C "$tmp/first-ade-github" rev-parse --short HEAD))"
+        echo "ADE_VALIDATOR=$tmp/first-ade-github/scripts/validate_axioms.sh" >> "$GITHUB_ENV"
+    - name: Validate axioms
+      shell: bash
+      env:
+        ADE_REPO_ROOT: ${{ github.workspace }}
+      run: |
+        set -euo pipefail
+        bash "$ADE_VALIDATOR"

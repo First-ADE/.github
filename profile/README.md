@@ -1,83 +1,40 @@
-# First ADE
+# First-ADE
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Initiative-Axiom--Driven%20Engineering-A855F7?style=for-the-badge&logo=github&logoColor=white" alt="ADE Initiative Badge" />
-  <img src="https://img.shields.io/badge/Focus-AI--Native%20Systems-3B82F6?style=for-the-badge&logo=openai&logoColor=white" alt="AI Focus Badge" />
-  <img src="https://img.shields.io/badge/OSS-Advocacy%20%26%20Research-10B981?style=for-the-badge&logo=git&logoColor=white" alt="OSS Advocacy Badge" />
-</p>
+> **Status:** active, single maintainer, pre-1.0. A personal initiative by [Brandon Fox](https://github.com/brandon-fox), not a company or a team.
 
----
+I build systems where the spec is the truth, the invariants are enforced by CI, and all of it is public. **Axiom-Driven Engineering (ADE)** is the name for that practice applied to AI-native software: the properties a system must never violate are written down as axioms, every axiom has a check, and the check runs on every commit. A model may be non-deterministic; the envelope around it is not.
 
-## 🎯 Our Mission
+## The three pillars
 
-**First ADE** is an Open Source Software advocacy group and personal initiative dedicated to pioneering **Axiom-Driven Engineering (ADE)** practices for developing **AI-Native Applications**. 
+| Pillar | What it means | Where it lives |
+| --- | --- | --- |
+| **System invariants** | Repository and build properties stated as falsifiable axioms (`A1`…`A9`) and validated by script on every push and pull request. | [`AXIOMS.md`](https://github.com/First-ADE/.github/blob/main/AXIOMS.md), [`scripts/validate_axioms.sh`](https://github.com/First-ADE/.github/blob/main/scripts/validate_axioms.sh) |
+| **Agentic determinism** | Runtime envelopes around model calls: prompt contracts validated as code, structured outputs validated against schemas before anything executes. | [`first-ade`](https://github.com/First-ADE/first-ade) compliance engines (spec, test, traceability, ADR, forbidden-API) |
+| **Granular governance** | Prompts and model configuration are code: reviewed, versioned, traceable to a specification and an architecture decision record. | [`first-ade`](https://github.com/First-ADE/first-ade) `docs/adr/`, `docs/POSTULATES.md`, `docs/CONSTITUTION.md` |
 
-As artificial intelligence moves from static prompts to autonomous, agentic workflows, software engineering must transition from *probabilistic testing* to *deterministic runtime validation*. We champion the integration of strict, CI-enforced formal invariants (axioms) directly into the development cycle of AI agents, ensuring LLM-native tools remain secure, robust, and completely verifiable.
+## Repositories
 
----
+| Repository | What it is | Status (by last push) | Stack |
+| --- | --- | --- | --- |
+| [`first-ade`](https://github.com/First-ADE/first-ade) | The ADE Compliance Framework: a CLI and FastAPI gateway that runs verification engines over a codebase and keeps a hash-chained audit log. | Active, 0.1.0, last push June 2026 | Python 3.11, Pydantic v2, SQLAlchemy, pyadr |
+| [`.github`](https://github.com/First-ADE/.github) | This repository: the axioms, the validator, the reusable CI action, the principles. | Active | Bash, bashunit, GitHub Actions |
+| `Constitution-MCP` | A Model Context Protocol server that serves agent constitutions and policies. | Private; last push February 2026 | Python |
 
-## 💡 The 3 Pillars of AI-Native ADE
+Applications of the method outside this org: [`alos`](https://github.com/brandon-fox/alos), a local-first autonomous agent runtime built spec-first, and the [Vindicta Platform](https://github.com/vindicta-platform) design record.
 
-To bridge the gap between non-deterministic AI generation and deterministic software reliability, our research champions three core pillars:
+## Start here
 
-```text
-    ┌─────────────────────────────────────────────────────────┐
-    │              Axiom-Driven Engineering (ADE)             │
-    └────────────────────────────┬────────────────────────────┘
-                                 │
-         ┌───────────────────────┼───────────────────────┐
-         ▼                       ▼                       ▼
- ┌───────────────┐       ┌───────────────┐       ┌───────────────┐
- │  1. SYSTEM    │       │   2. AGENTIC  │       │  3. GRANULAR  │
- │  INVARIANTS   │       │  DETERMINISM  │       │  GOVERNANCE   │
- └───────┬───────┘       └───────┬───────┘       └───────┬───────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-  CI-Enforced Code       Boundary & Prompt      Architects/Devs
-  & Script Contracts      Output Contracts      Prompt-As-Code
-```
+1. Read [`AXIOMS.md`](https://github.com/First-ADE/.github/blob/main/AXIOMS.md): nine invariants, each with a rationale and the exact check.
+2. Run `./scripts/validate_axioms.sh` in any clone; it fails loudly on the first violation.
+3. Read [`PRINCIPLES.md`](https://github.com/First-ADE/.github/blob/main/PRINCIPLES.md) for the rules every repository here is held to.
+4. To use the checks in your own repository, add the `First-ADE/.github/.github/actions/ade-axioms` action to a workflow.
 
-### 🛡️ 1. Formal System Invariants
-Traditional codebase quality is verified post-facto. Under ADE, critical properties are defined as **unbreakable mathematical invariants** (Axioms) checked on every git commit. 
-- *Axiom A1-A3*: Strict shebang checks, file permissions, and file presence.
-- *Axiom A4*: Structural integrity verification of automated workflows.
-- *Enforcement*: Automated local validations prevent broken states from ever hitting the trunk.
+## Contributing
 
-### ⚙️ 2. Agentic Determinism (Cognitive Contracts)
-AI Native applications are inherently non-deterministic. ADE addresses this by creating **runtime validation envelopes** (boundary checkers) that wrapping model interfaces.
-- *Prompt Contracts*: Validating model prompts and system instructions as code.
-- *Output Envelopes*: Programmatic validation of structured LLM outputs against strict schemas, catching hallucinations before execution.
+Pull requests are welcome. Sign each commit with the Developer Certificate of Origin (`git commit -s`); see [`CONTRIBUTING.md`](https://github.com/First-ADE/.github/blob/main/CONTRIBUTING.md). Code of conduct: [`CODE_OF_CONDUCT.md`](https://github.com/First-ADE/.github/blob/main/.github/CODE_OF_CONDUCT.md).
 
-### 👥 3. Granular Governance (Prompt-As-Code)
-Prompts and model configurations are code. We advocate for peer-reviewed, team-level governance over AI knowledge bases and instructions.
-- *Structured Access*: Mapped organization-wide roles (`Architects` vs `Developers`) to enforce code reviews on model parameters.
-- *Traceability*: Complete accountability of prompt changes and benchmark evaluations before merging.
+Contact: 32090240+brandon-fox@users.noreply.github.com · [LinkedIn](https://www.linkedin.com/in/brandonlouisfox)
 
 ---
 
-## 📂 Core Repository Index
-
-Our open-source initiative is structured across three fundamental repositories:
-
-| Repository | Primary Purpose | Primary Tech | Access | Status |
-| :--- | :--- | :--- | :--- | :--- |
-| [📂 .github](https://github.com/First-ADE/.github) | **Organization Core**: Global workflows, CI shebang validators, and community standards. | Shell / PowerShell | `Public` | ![Active](https://img.shields.io/badge/Status-Active-success?style=flat-square) |
-| [📂 first-ade](https://github.com/First-ADE/first-ade) | **Core SDK & Framework**: Reusable boundary checking, model benchmarks, and ADE validators. | Python / Shell | `Public` | ![Beta](https://img.shields.io/badge/Status-Beta-orange?style=flat-square) |
-| [📂 Constitution-MCP](https://github.com/First-ADE/Constitution-MCP) | **Agent Core**: Model Context Protocol (MCP) server defining agent constitutions and policies. | Python | `Private` | ![Secure](https://img.shields.io/badge/Status-Secure-blue?style=flat-square) |
-
----
-
-## 🤝 Getting Started & Onboarding
-
-Whether you are a developer looking to integrate ADE guardrails or an OSS advocate interested in AI determinism, we welcome your collaboration!
-
-- **Onboarding Guide**: Check out our global [README.md](https://github.com/First-ADE/.github/blob/main/README.md) to understand local development.
-- **Repository Invariants**: Familiarize yourself with our [AXIOMS.md](https://github.com/First-ADE/.github/blob/main/AXIOMS.md) which defines the active system rules.
-- **Code of Conduct**: We hold ourselves to professional, welcoming collaboration. Read our [CODE_OF_CONDUCT.md](https://github.com/First-ADE/.github/blob/main/.github/CODE_OF_CONDUCT.md).
-- **Contributing**: Ready to make a change? Review the standard checklist inside our [Pull Request Template](https://github.com/First-ADE/.github/blob/main/.github/pull_request_template.md).
-
----
-
-<p align="center">
-  <sub>Built with 💜 by the First-ADE OSS Advocacy Group. "Rigorous AI requires rigorous engineering."</sub>
-</p>
+All work here is personal and independent of any employer. Views, writing and code are my own. MIT licensed, copyright Brandon Fox.
