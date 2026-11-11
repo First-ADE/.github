@@ -20,7 +20,7 @@ I build systems where the spec is the truth, the invariants are enforced by CI, 
 | [`.github`](https://github.com/First-ADE/.github) | This repository: the axioms, the validator, the reusable CI action, the principles. | Active | Bash, bashunit, GitHub Actions |
 | `Constitution-MCP` | A Model Context Protocol server that serves agent constitutions and policies. | Private; last push February 2026 | Python |
 
-Applications of the method outside this org: [`alos`](https://github.com/brandon-fox/alos), a local-first autonomous agent runtime built spec-first, and the [Vindicta Platform](https://github.com/vindicta-platform) design record.
+Applications of the method outside this org: [`alos`](https://github.com/brandon-fox/alos), a local-first autonomous agent runtime built spec-first, and the [Vindicta Platform](https://github.com/vindicta-platform), whose dice core is the method's current proving ground.
 
 ## Start here
 
