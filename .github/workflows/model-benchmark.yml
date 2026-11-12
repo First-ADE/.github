@@ -10,13 +10,12 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   benchmark-models:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     steps:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -24,28 +23,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: '3.10'
-
-      - name: Setup Ollama and Pull Primary Model
-        uses: ./.github/actions/setup-ollama
-        with:
-          model: 'qwen2.5-coder:3b'
-
-      - name: Pull Additional Evaluation Models
-        run: |
-          ollama pull llama3.2:3b
-          ollama pull llama3.2:1b
+          python-version: '3.12'
 
       - name: Run Cross-Model Benchmark
-        run: python scripts/evaluate_models.py
-
-      - name: Open Pull Request with Benchmark Results
-        uses: peter-evans/create-pull-request@15733dbdfeedb4f7fdb73d13c6f5ac83b710fab8 # v8.1.2.0.8.1.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          add-paths: MODEL_BENCHMARK.md
-          branch: chore/model-benchmark-report
-          delete-branch: true
-          commit-message: "chore(benchmark): update cross-model evaluation report"
-          title: "chore(benchmark): update cross-model evaluation report"
-          body: "Automated update of `MODEL_BENCHMARK.md` from the scheduled cross-model evaluation workflow."
+        run: |
+          python scripts/evaluate_models.py
+          if [ -f MODEL_BENCHMARK.md ]; then
+            cat MODEL_BENCHMARK.md >> "$GITHUB_STEP_SUMMARY"
+          fi
