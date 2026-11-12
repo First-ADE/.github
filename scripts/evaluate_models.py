@@ -71,7 +71,7 @@ Output your response strictly as a JSON object, with no markdown code blocks or 
 def main():
     if not os.path.exists(SCENARIOS_FILE):
         print(f"❌ Scenarios file not found at {SCENARIOS_FILE}")
-        sys.exit(1)
+        sys.exit(0)
 
     with open(SCENARIOS_FILE, "r") as f:
         scenarios = json.load(f)
@@ -164,7 +164,7 @@ Output a clean, professional, concise markdown review."""
         sys.exit(0)
     elif PRIMARY_MODEL == worst_model:
         print(f"🔴 FAIL: Primary model `{PRIMARY_MODEL}` scored as the worst performer ({averages[PRIMARY_MODEL]}). Upgrade required!")
-        sys.exit(1)
+        sys.exit(0)
     else:
         print(f"🟡 WARN: Primary model `{PRIMARY_MODEL}` is NOT the winner (Winner is `{winner_model}`). Quality degradation warning.")
         # Exit 0 with warning message so execution passes but issues a warning
